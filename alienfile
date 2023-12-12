@@ -6,8 +6,8 @@ use Path::Tiny;
 plugin 'Probe::CommandLine' => (
   command => 'pandoc',
   args    => [ '--version' ],
-  match   => qr/^pandoc ([0-9\.]+)/,
-  version => qr/^pandoc ([0-9\.]+)/,
+  match   => qr/^pandoc(?:\.exe)? ([0-9\.]+)/i,
+  version => qr/^pandoc(?:\.exe)? ([0-9\.]+)/i,
 );
 
 
