@@ -9,7 +9,7 @@ use 5.008004;
 
 =head1 NAME
 
-Alien::pandoc - Find or build pandoc
+Alien::pandoc - Find or build pandoc universal document converter
 
 =head1 SYNOPSIS
 
@@ -32,6 +32,10 @@ for the use of other modules.
 =head1 SEE ALSO
 
 =over 4
+
+=item L<https://pandoc.org/>
+
+Pandoc homepage
 
 =item L<Alien>
 

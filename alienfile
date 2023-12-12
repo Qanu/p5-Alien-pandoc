@@ -1,17 +1,43 @@
 use alienfile;
 
-# replace this with your own system probe.
-# See Alien::Build::Plugin::Probe and
-# Alien::Build::Plugin::PkgConfig for common
-# probe plugins.
-probe sub { 'share' };
+plugin 'Probe::CommandLine' => (
+  command => 'pandoc',
+  args    => [ '--version' ],
+  match   => qr/^pandoc ([0-9\.]+)/,
+  version => qr/^pandoc ([0-9\.]+)/,
+);
+
 
 share {
-  start_url 'https://github.com/jgm/pandoc/releases/download/3.1.9';
-  plugin Download => (
-    filter  => qr/^pandoc.*tar\.gz$/,
-    version => qr/([0-9\.]+)/,
+  my %os_arch_mapping = (
+    'darwin-aarch64'  => { tag => 'arm64-macOS'   , format => 'zip'    },
+    'darwin-x86_64'   => { tag => 'x86_64-macOS'  , format => 'zip'    },
+    'linux-x86_64'    => { tag => 'linux-amd64'   , format => 'tar.gz' },
+    'linux-aarch64'   => { tag => 'linux-arm64'   , format => 'tar.gz' },
+    'MSWin32-x86_64'  => { tag => 'windows-x86_64', format => 'zip'    },
   );
-  plugin Extract => 'tar.gz';
-  plugin 'Gather::IsolateDynamic';
+
+  my $os = $^O;
+  my $meta_arch = meta->prop->{platform}{cpu}{arch}{name};
+  my $os_arch = "$os-$meta_arch";
+
+  my $match = qr{
+    ^
+    pandoc-([0-9\.]+)
+    -
+    @{[ $os_arch_mapping{$os_arch}{tag} ]}
+    \.
+    \Q@{[ $os_arch_mapping{$os_arch}{format} ]}\E
+    $
+  }x;
+
+  plugin 'Download::GitHub' => (
+    github_user => 'jgm',
+    github_repo => 'pandoc',
+    asset        =>  1,
+    asset_name   => $match,
+    asset_format => $os_arch_mapping{$os_arch}{format},
+  );
+  plugin Extract => $os_arch_mapping{$os_arch}{format};
+  plugin 'Build::Copy';
 }
