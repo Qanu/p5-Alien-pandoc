@@ -8,6 +8,6 @@ alien_ok 'Alien::pandoc';
 
 run_ok([ 'pandoc', '--version' ])
   ->success
-  ->out_like(qr/^pandoc ([0-9\.]+)/);
+  ->out_like(qr/^pandoc(?:\.exe)? ([0-9\.]+)/i);
 
 done_testing;
